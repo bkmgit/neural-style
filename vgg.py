@@ -6,9 +6,9 @@ import scipy.io
 
 # work-around for more recent versions of tensorflow
 # https://github.com/tensorflow/tensorflow/issues/24496
-config = tf.ConfigProto()
+config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
-sess = tf.Session(config=config)
+sess = tf.compat.v1.Session(config=config)
 
 VGG19_LAYERS = (
     'conv1_1', 'relu1_1', 'conv1_2', 'relu1_2', 'pool1',
@@ -65,17 +65,17 @@ def net_preloaded(weights, input_image, pooling):
     return net
 
 def _conv_layer(input, weights, bias):
-    conv = tf.nn.conv2d(input, tf.constant(weights), strides=(1, 1, 1, 1),
+    conv = tf.nn.conv2d(input=input, filters=tf.constant(weights), strides=(1, 1, 1, 1),
             padding='SAME')
     return tf.nn.bias_add(conv, bias)
 
 
 def _pool_layer(input, pooling):
     if pooling == 'avg':
-        return tf.nn.avg_pool(input, ksize=(1, 2, 2, 1), strides=(1, 2, 2, 1),
+        return tf.nn.avg_pool2d(input=input, ksize=(1, 2, 2, 1), strides=(1, 2, 2, 1),
                 padding='SAME')
     else:
-        return tf.nn.max_pool(input, ksize=(1, 2, 2, 1), strides=(1, 2, 2, 1),
+        return tf.nn.max_pool2d(input=input, ksize=(1, 2, 2, 1), strides=(1, 2, 2, 1),
                 padding='SAME')
 
 def preprocess(image, mean_pixel):
